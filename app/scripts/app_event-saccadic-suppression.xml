@@ -1,0 +1,123 @@
+<application>
+<name> event-saccadic-suppression </name>
+
+<dependencies>
+</dependencies>
+
+<module>
+  <name> event-saccadic-suppression </name>
+  <parameters> --name /vSacSup </parameters>
+  <node> localhost </node>
+</module>
+
+<module>
+  <name>vPreProcess</name>
+  <parameters> --flipx --flipy </parameters>
+  <node> localhost </node>
+</module>
+
+<module>
+  <name>vFramer</name>
+  <parameters>--name /vFramer --frameRate 20 --displays "(0 /left (AE) 1 /right (AE))"</parameters>
+  <node> localhost </node>
+</module>
+
+<module>
+    <name>yarpview</name>
+    <parameters>--name /vviewleft --x 000 --y 600 --synch --w 608 --h 480 </parameters>
+    <node>localhost</node>
+</module>
+
+<module>
+    <name>yarpview</name>
+    <parameters>--name /vviewright --x 700 --y 600 --synch --w 608 --h 480</parameters>
+    <node>localhost</node>
+</module>
+
+<module>
+  <name>yarpview</name>
+  <parameters>--name /icub/view/left --x 0 --y 0 --synch --w 640 --h 512 </parameters>
+  <node>localhost</node>
+</module>
+
+<module>
+  <name>yarpview</name>
+  <parameters>--name /icub/view/right --x 700 --y 0 --synch --w 640 --h 512 </parameters>
+  <node>localhost</node>
+</module>
+
+<module>
+  <name> yarpscope </name>
+    <parameters> --remote /icub/torso/state:o --index "(0 1 2)" --x 1400 --y 0 --interval 200 </parameters>
+    <environment> YARP_PORT_PREFIX=/torso </environment>
+    <node>localhost</node>
+    <dependencies>
+    <port> /icub/torso/state:o </port>
+    </dependencies>
+</module>
+
+<module>
+    <name> yarpscope </name>
+    <parameters> --remote /icub/head/state:o --index "(0 1 2 3 4 5)" --x 1400 --y 600 --interval 200 </parameters>
+    <environment> YARP_PORT_PREFIX=/head </environment>
+    <node>localhost</node>
+    <dependencies>
+    <port> /icub/head/state:o </port>
+    </dependencies>
+</module>
+
+<connection>
+    <from>/icub/torso/state:o</from>
+    <to>/vSacSup/torso/state:i</to>
+    <protocol>udp</protocol>
+</connection>
+
+<connection>
+    <from>/icub/head/state:o</from>
+    <to>/vSacSup/head/state:i</to>
+    <protocol>udp</protocol>
+</connection>
+
+<connection>
+  <from>/zynqGrabber/vBottle:o</from>
+  <to>/vSacSup/vBottle:i</to>
+    <protocol>udp</protocol>
+</connection>
+
+<connection>
+    <from>/vSacSup/vBottle:o</from>
+    <to>/vPreProcess/vBottle:i</to>
+    <protocol>udp</protocol>
+</connection>
+
+<connection>
+    <from>/vPreProcess/vBottle:o</from>
+    <to>/vFramer/AE:i</to>
+    <protocol>udp</protocol>
+</connection>
+
+<connection>
+    <from>/vFramer/left</from>
+    <to>/vviewleft</to>
+    <protocol>udp</protocol>
+</connection>
+
+<connection>
+    <from>/vFramer/right</from>
+    <to>/vviewright</to>
+    <protocol>udp</protocol>
+</connection>
+
+<connection>
+  <from>/icub/camcalib/left/out</from>
+  <to>/icub/view/left</to>
+  <protocol>udp</protocol>
+</connection>
+
+<connection>
+  <from>/icub/camcalib/right/out</from>
+  <to>/icub/view/right</to>
+  <protocol>udp</protocol>
+</connection>
+
+</application>

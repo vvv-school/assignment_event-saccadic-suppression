@@ -1,0 +1,15 @@
+<application>
+    <name>Fixture for Assignment on Event Saccadic Suppression</name>
+    <description>A fixture to prepare components required for the assignment</description>
+    <version>1.0</version>
+    <authors>
+        <author email="arren.glover@iit.it">Arren Glover</author>
+    </authors>
+
+    <module>
+        <name> event-saccadic-suppression </name>
+        <parameters> --name /vSacSup </parameters>
+        <node>localhost</node>
+    </module>
+
+</application>
