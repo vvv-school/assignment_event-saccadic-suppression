@@ -52,7 +52,7 @@ public:
 
         double false_negatives = 0;
         double max_fp = 1240;
-        for(size_t i = 0; i < td.size(); i++) {
+        for(size_t i = 1; i < td.size(); i++) {
             if(td[i] > 1950 && td[i] < 2150)
                 false_negatives++;
             else if(td[i] > 2625 && td[i] < 2910)
@@ -62,6 +62,8 @@ public:
             else if(td[i] > 4245 && td[i] < 4505)
                 false_negatives++;
             else if(td[i] > 4870 && td[i] < 5160)
+                false_negatives++;
+            else if(td[i] < 0 || td[i-1] >= td[i])
                 false_negatives++;
         }
         fnratio = false_negatives / max_fp;
