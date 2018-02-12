@@ -24,7 +24,7 @@ The events due to the camera motion, which can still be seen in the image below,
 ## Testing
 Event-driven datasets can be found at `$ROBOT_CODE/datasets/VVV-eventdriven` in the provided virtual machine, and instructions for getting the datasets and uncompressing them can be found [here](https://github.com/vvv-school/vvv18/wiki/How-to-prepare-your-system#download-datasets). Three datasets are available to use for testing and can be loaded into the `yarpdatapayer` by opening `VVV-eventdriven/1`, `VVV-eventdriven/2`, or `VVV-eventdriven/3` in the `yarpdataplayer` loading GUI. The datasets contain the event-stream, the torso and head encoder values and the standard camera frames for comparison. 
 
-Once you are happy your saccadic suppression is working, you can test your code **Automatically**: [running the script **test.sh**](https://github.com/vvv-school/vvv-school.github.io/blob/master/instructions/how-to-run-smoke-tests.md) in the **smoke-test** directory. The smoke test will give a maximum of 3 marks.
+Once you are happy your saccadic suppression is working, you can test your code **Automatically**: [running the script **test.sh**](https://github.com/vvv-school/vvv-school.github.io/blob/master/instructions/how-to-run-smoke-tests.md) in the **smoke-test** directory. The smoke test will give a maximum of 6 marks.
 
 ## Hints and Tips
 - The ports ``/icub/torso/state:o`` and ``/icub/head/state:o`` publish the encoder values while there is a valid _yarprobotinterface_ running. For the dataset we have recorded these ports along with the visual stimulus.
