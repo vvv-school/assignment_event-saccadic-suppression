@@ -76,11 +76,14 @@ void eventGatePort::onRead(vBottle &input)
     //if active pass through the bottle from input to output
     if(active) {
 
-        //copy the timestamp to the output port
-        //copy the data to the output port
+        //copy the timestamp to the new output
+        yarp::os::Stamp yarpstamp;
+        getEnvelope(yarpstamp);
+        output_port.setEnvelope(yarpstamp);
 
-        // FILL IN CODE HERE
-
+        //copy the data
+        output_port.prepare() = input;
+        output_port.writeStrict();
     }
 
     //else do nothing;
@@ -115,7 +118,7 @@ bool saccadicSuppression::configure(yarp::os::ResourceFinder &rf)
 
     //set the parameters using the RFModule configure magic
     vel_threshold =
-            rf.check("threshold", yarp::os::Value(0.1)).asDouble();
+            rf.check("threshold", yarp::os::Value(5.7)).asDouble();
     update_period =
             rf.check("update", yarp::os::Value(0.001)).asDouble();
     std::string port_name =
@@ -160,10 +163,12 @@ bool saccadicSuppression::checkEyeMotion()
 
 bool saccadicSuppression::openJointReaders(std::string module_name)
 {
+    std::string torso_port_name = module_name + "/torso/state:i";
+    std::string head_port_name  = module_name + "/head/state:i";
 
     //open ports for reading the torso and head encoder values
-    //these ports should be names /icub/torso/state:o and
-    // /icub/head/state:o
+    //these ports should be the names given above where
+    //module_name should be "/vSacSup"
     //return false if all ports aren't open
 
     //FILL IN CODE HERE
