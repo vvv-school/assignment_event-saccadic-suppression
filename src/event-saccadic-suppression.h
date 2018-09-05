@@ -1,9 +1,8 @@
 #include <yarp/os/all.h>
-#include <yarp/sig/Matrix.h>
-#include <yarp/sig/Image.h>
-#include <iCub/eventdriven/all.h>
 #include <iCub/ctrl/adaptWinPolyEstimator.h>
-using namespace ev;
+#include <string>
+using namespace yarp::os;
+using std::string;
 
 /******************************************************************************/
 //eventGatePort
@@ -11,7 +10,7 @@ using namespace ev;
 //This class is an input port with a corresponding output port.
 //Default operation is to send the input to the output
 //By calling disactivate the input will be discarded instead
-class eventGatePort : public yarp::os::BufferedPort<vBottle>
+class eventGatePort : public yarp::os::BufferedPort<Bottle>
 {
 private:
 
@@ -19,7 +18,7 @@ private:
     bool active;
 
     //output port (also this class has a port of it's own)
-    yarp::os::BufferedPort<vBottle> output_port;
+    BufferedPort<Bottle> output_port;
 
 public:
 
@@ -31,8 +30,8 @@ public:
 
     virtual void interrupt();
     virtual void close();
-    virtual void onRead(vBottle &input);
-    virtual bool open(const yarp::os::ConstString &name);
+    virtual void onRead(Bottle &input);
+    virtual bool open(const string &name);
 
 };
 
@@ -52,8 +51,8 @@ private:
     double update_period;
 
     //motor state readers
-    yarp::os::BufferedPort<yarp::sig::Vector> torso_reader;
-    yarp::os::BufferedPort<yarp::sig::Vector> head_reader;
+    BufferedPort<yarp::sig::Vector> torso_reader;
+    BufferedPort<yarp::sig::Vector> head_reader;
 
     //velocity estimators
     iCub::ctrl::AWLinEstimator *torso_vel;

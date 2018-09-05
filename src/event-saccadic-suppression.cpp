@@ -8,14 +8,14 @@
 int main(int argc, char * argv[])
 {
     /* initialize yarp network */
-    yarp::os::Network yarp;
+    Network yarp;
     if(!yarp.checkNetwork()) {
         yError() << "Could not connect to yarp";
         return false;
     }
 
     /* prepare and configure the resource finder */
-    yarp::os::ResourceFinder rf;
+    ResourceFinder rf;
     rf.setDefaultConfigFile("saccadic-suppression.ini");
     rf.setDefaultContext("eventdriven");
     rf.configure(argc, argv);
@@ -40,38 +40,38 @@ void eventGatePort::disactivate()
     active = false;
 }
 
-bool eventGatePort::open(const yarp::os::ConstString &name)
+bool eventGatePort::open(const string &name)
 {
     //set up the eventGatePort and open input and output ports
     setStrict();
     useCallback();
     return output_port.open(name + "/vBottle:o") &&
-            yarp::os::BufferedPort<vBottle>::open(name + "/vBottle:i");
+            BufferedPort<Bottle>::open(name + "/vBottle:i");
 }
 
 void eventGatePort::interrupt()
 {
     //interrupt evreything
     disactivate();
-    yarp::os::BufferedPort<vBottle>::interrupt();
+    BufferedPort<Bottle>::interrupt();
     output_port.interrupt();
 }
 
 void eventGatePort::close()
 {
     //close everything
-    yarp::os::BufferedPort<vBottle>::close();
+    BufferedPort<Bottle>::close();
     output_port.close();
 }
 
 eventGatePort::~eventGatePort()
 {
     //destruct everything
-    yarp::os::BufferedPort<vBottle>::close();
+    BufferedPort<Bottle>::close();
     output_port.close();
 }
 
-void eventGatePort::onRead(vBottle &input)
+void eventGatePort::onRead(Bottle &input)
 {
     //if active pass through the bottle from input to output
     if(active) {
@@ -161,10 +161,10 @@ bool saccadicSuppression::checkEyeMotion()
     return head_changed || torso_changed;
 }
 
-bool saccadicSuppression::openJointReaders(std::string module_name)
+bool saccadicSuppression::openJointReaders(string module_name)
 {
-    std::string torso_port_name = module_name + "/torso/state:i";
-    std::string head_port_name  = module_name + "/head/state:i";
+    string torso_port_name = module_name + "/torso/state:i";
+    string head_port_name  = module_name + "/head/state:i";
 
     //open ports for reading the torso and head encoder values
     //these ports should be the names given above where
