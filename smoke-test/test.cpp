@@ -8,16 +8,16 @@
 #include <fstream>
 #include <unistd.h>
 
-#include <yarp/rtf/TestCase.h>
-#include <rtf/dll/Plugin.h>
-#include <rtf/TestAssert.h>
+#include <yarp/robottestingframework/TestCase.h>
+#include <robottestingframework/dll/Plugin.h>
+#include <robottestingframework/TestAssert.h>
 
 
 #include <yarp/os/all.h>
 #include <iCub/eventdriven/all.h>
 
 using namespace std;
-using namespace RTF;
+using namespace robottestingframework;
 
 class bottleNumberChecker : public yarp::os::BufferedPort< ev::vBottle >
 {
@@ -165,7 +165,7 @@ public:
 
 
 /**********************************************************************/
-class TestAssignmentEventSaccadicSuppression : public yarp::rtf::TestCase
+class TestAssignmentEventSaccadicSuppression : public yarp::robottestingframework::TestCase
 {
 
 private:
@@ -177,7 +177,7 @@ private:
 public:
     /******************************************************************/
     TestAssignmentEventSaccadicSuppression() :
-        yarp::rtf::TestCase("TestAssignmentEventSaccadicSuppression")
+        yarp::robottestingframework::TestCase("TestAssignmentEventSaccadicSuppression")
     {
     }
 
@@ -193,33 +193,33 @@ public:
         //we need to load the data file into yarpdataplayer
         std::string cntlportname = "/playercontroller/rpc";
 
-        RTF_ASSERT_ERROR_IF_FALSE(playercontroller.open(cntlportname),
+        ROBOTTESTINGFRAMEWORK_ASSERT_ERROR_IF_FALSE(playercontroller.open(cntlportname),
                                   "Could not open RPC to yarpdataplayer");
 
-        RTF_ASSERT_ERROR_IF_FALSE(yarp::os::Network::connect(cntlportname, "/yarpdataplayer/rpc:i"),
+        ROBOTTESTINGFRAMEWORK_ASSERT_ERROR_IF_FALSE(yarp::os::Network::connect(cntlportname, "/yarpdataplayer/rpc:i"),
                                   "Could not connect RPC to yarpdataplayer");
 
         //we need to check the output of yarpdataplayer is open and input of spiking model
-        RTF_ASSERT_ERROR_IF_FALSE(yarp::os::Network::connect("/zynqGrabber/vBottle:o", "/vSacSup/vBottle:i", "udp"),
+        ROBOTTESTINGFRAMEWORK_ASSERT_ERROR_IF_FALSE(yarp::os::Network::connect("/zynqGrabber/vBottle:o", "/vSacSup/vBottle:i", "udp"),
                                   "Could not connect yarpdataplayer to assignment module (events)");
 
-        RTF_ASSERT_ERROR_IF_FALSE(yarp::os::Network::connect("/icub/torso/state:o", "/vSacSup/torso/state:i", "udp"),
+        ROBOTTESTINGFRAMEWORK_ASSERT_ERROR_IF_FALSE(yarp::os::Network::connect("/icub/torso/state:o", "/vSacSup/torso/state:i", "udp"),
                                   "Could not connect yarpdataplayer to assignment module (torso)");
 
-        RTF_ASSERT_ERROR_IF_FALSE(yarp::os::Network::connect("/icub/head/state:o", "/vSacSup/head/state:i", "udp"),
+        ROBOTTESTINGFRAMEWORK_ASSERT_ERROR_IF_FALSE(yarp::os::Network::connect("/icub/head/state:o", "/vSacSup/head/state:i", "udp"),
                                   "Could not connect yarpdataplayer to assignment module (head)");
 
         //check we can open our spike checking consumer
-        RTF_ASSERT_ERROR_IF_FALSE(checker.open("/checker/vBottle:i"),
+        ROBOTTESTINGFRAMEWORK_ASSERT_ERROR_IF_FALSE(checker.open("/checker/vBottle:i"),
                                   "Could not open checker");
 
         //the output of spiking model
-        RTF_ASSERT_ERROR_IF_FALSE(yarp::os::Network::connect("/vSacSup/vBottle:o", "/checker/vBottle:i", "udp"),
+        ROBOTTESTINGFRAMEWORK_ASSERT_ERROR_IF_FALSE(yarp::os::Network::connect("/vSacSup/vBottle:o", "/checker/vBottle:i", "udp"),
                                   "Could not connect assignment to checker");
 
-        RTF_TEST_REPORT("Ports successfully open and connected");
+        ROBOTTESTINGFRAMEWORK_TEST_REPORT("Ports successfully open and connected");
 
-//        RTF_ASSERT_ERROR_IF_FALSE(checker.loadGroundTruth("../bottle_numbers.csv"),
+//        ROBOTTESTINGFRAMEWORK_ASSERT_ERROR_IF_FALSE(checker.loadGroundTruth("../bottle_numbers.csv"),
 //                                  "Could not load ground truth");
 
         return true;
@@ -228,7 +228,7 @@ public:
     /******************************************************************/
     virtual void tearDown()
     {
-        RTF_TEST_REPORT("Closing Clients");
+        ROBOTTESTINGFRAMEWORK_TEST_REPORT("Closing Clients");
         playercontroller.close();
         checker.close();
     }
@@ -242,48 +242,48 @@ public:
         yarp::os::Bottle cmd, reply;
         cmd.addString("play");
         playercontroller.write(cmd, reply);
-        RTF_ASSERT_ERROR_IF_FALSE(reply.get(0).asString() == "ok", "Did not successfully play the dataset");
+        ROBOTTESTINGFRAMEWORK_ASSERT_ERROR_IF_FALSE(reply.get(0).asString() == "ok", "Did not successfully play the dataset");
 
-        RTF_TEST_REPORT("Playing dataset - please wait till it finishes automatically");
+        ROBOTTESTINGFRAMEWORK_TEST_REPORT("Playing dataset - please wait till it finishes automatically");
         yarp::os::Time::delay(30);
 
         cmd.clear();
         cmd.addString("stop");
         playercontroller.write(cmd, reply);
-        RTF_ASSERT_ERROR_IF_FALSE(reply.get(0).asString() == "ok", "Did not successfully stop the dataset");
-        RTF_TEST_REPORT("Stopping dataset - wait for score calculation");
+        ROBOTTESTINGFRAMEWORK_ASSERT_ERROR_IF_FALSE(reply.get(0).asString() == "ok", "Did not successfully stop the dataset");
+        ROBOTTESTINGFRAMEWORK_TEST_REPORT("Stopping dataset - wait for score calculation");
 
         checker.performComparison();
 
-        RTF_TEST_REPORT(Asserter::format("Percentage of saccade not blocked: %f", checker.fnratio));
-        RTF_TEST_REPORT(Asserter::format("Total correctly not blocked: %d", checker.tn));
+        ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Percentage of saccade not blocked: %f", checker.fnratio));
+        ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Total correctly not blocked: %d", checker.tn));
 
         int score = 0;
         //if a metric is too low give 0
         if(checker.fnratio > 0.8 ) {
-            RTF_TEST_REPORT("Not enough blocked events(0)");
+            ROBOTTESTINGFRAMEWORK_TEST_REPORT("Not enough blocked events(0)");
         } else if(checker.tn < 1000) {
-            RTF_TEST_REPORT("Too many events blocked(0)");
+            ROBOTTESTINGFRAMEWORK_TEST_REPORT("Too many events blocked(0)");
         } else {
             if(checker.fnratio < 0.1) {
-                RTF_TEST_REPORT("Blocked Events: max points(3)");
+                ROBOTTESTINGFRAMEWORK_TEST_REPORT("Blocked Events: max points(3)");
                 score += 3;
             } else if(checker.fnratio < 0.3) {
-                RTF_TEST_REPORT("Blocked Events: good(2)");
+                ROBOTTESTINGFRAMEWORK_TEST_REPORT("Blocked Events: good(2)");
                 score += 2;
             } else if(checker.fnratio < 0.5) {
-                RTF_TEST_REPORT("Blocked Events: passed(1)");
+                ROBOTTESTINGFRAMEWORK_TEST_REPORT("Blocked Events: passed(1)");
                 score += 1;
             }
 
             if(checker.tn > 5500) {
-                RTF_TEST_REPORT("Non-blocked Events: max points(3)");
+                ROBOTTESTINGFRAMEWORK_TEST_REPORT("Non-blocked Events: max points(3)");
                 score += 3;
             } else if(checker.tn > 4500) {
-                RTF_TEST_REPORT("Non-blocked Events: good(2)");
+                ROBOTTESTINGFRAMEWORK_TEST_REPORT("Non-blocked Events: good(2)");
                 score += 2;
             } else if(checker.tn > 3000) {
-                RTF_TEST_REPORT("Non-blocked Events: passed(1)");
+                ROBOTTESTINGFRAMEWORK_TEST_REPORT("Non-blocked Events: passed(1)");
                 score += 1;
             }
 
@@ -292,18 +292,18 @@ public:
 
 
         //checker.saveResult("../bottle_numbers_td.csv");
-        //RTF_TEST_REPORT(Asserter::format("percentage = %d", score));
+        //ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("percentage = %d", score));
         //score = 0.5 + 3.0 * score / 100.0;
-        RTF_TEST_REPORT("Maximum Score (6)");
-        RTF_TEST_CHECK(score>0, Asserter::format("Total score = %d", score));
+        ROBOTTESTINGFRAMEWORK_TEST_REPORT("Maximum Score (6)");
+        ROBOTTESTINGFRAMEWORK_TEST_CHECK(score>0, Asserter::format("Total score = %d", score));
 
-//        RTF_TEST_REPORT(Asserter::format("Inliers = %d", inliers));
-//        RTF_TEST_REPORT(Asserter::format("Outliers = %d", outliers));
-//        RTF_ASSERT_ERROR_IF_FALSE(inliers > 3000, "Inlier score too low (3000)");
-//        RTF_ASSERT_ERROR_IF_FALSE(outliers < 500, "Outlier score too high (500)");
+//        ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Inliers = %d", inliers));
+//        ROBOTTESTINGFRAMEWORK_TEST_REPORT(Asserter::format("Outliers = %d", outliers));
+//        ROBOTTESTINGFRAMEWORK_ASSERT_ERROR_IF_FALSE(inliers > 3000, "Inlier score too low (3000)");
+//        ROBOTTESTINGFRAMEWORK_ASSERT_ERROR_IF_FALSE(outliers < 500, "Outlier score too high (500)");
 
 
     }
 };
 
-PREPARE_PLUGIN(TestAssignmentEventSaccadicSuppression)
+ROBOTTESTINGFRAMEWORK_PREPARE_PLUGIN(TestAssignmentEventSaccadicSuppression)
